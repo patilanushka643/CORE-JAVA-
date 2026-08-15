@@ -5,7 +5,7 @@
 
 | Progress | Progress | Progress | Progress | Progress |
 | :---: | :---: | :---: | :---: | :---: |
-| Day 1 ⬜ | Day 2 ⬜ | Day 3 ⬜ | Day 4 ⬜ | Day 5 ⬜ |
+| Day 1 ✅ | Day 2 ⬜ | Day 3 ⬜ | Day 4 ⬜ | Day 5 ⬜ |
 | Day 6 ⬜ | Day 7 ⬜ | Day 8 ⬜ | Day 9 ⬜ | Day 10 ⬜ |
 | Day 11 ⬜ | Day 12 ⬜ | Day 13 ⬜ | Day 14 ⬜ | Day 15 ⬜ |
 | Day 16 ⬜ | Day 17 ⬜ | Day 18 ⬜ | Day 19 ⬜ | Day 20 ⬜ |
@@ -13,21 +13,21 @@
 ## 2. Day-by-Day Topic Breakdown with Interactive Checkboxes
 
 ### Day 1: Java Fundamentals
-- [ ] Introduction to Java
-- [ ] History of Java
-- [ ] Features of Java
-- [ ] Java Architecture
-- [ ] JVM
-- [ ] JRE
-- [ ] JDK
-- [ ] Java Program Structure
-- [ ] Compilation Process
-- [ ] Bytecode
-- [ ] Java Execution Process
-- [ ] Java Naming Conventions
-- [ ] Comments in Java
-- [ ] Keywords
-- [ ] Identifiers
+- ✅ Introduction to Java
+- ✅ History of Java
+- ✅ Features of Java
+- ✅ Java Architecture
+- ✅ JVM
+- ✅JRE
+- ✅ JDK
+- ✅ Java Program Structure
+- ✅ Compilation Process
+- ✅ Bytecode
+- ✅ Java Execution Process
+- ✅ Java Naming Conventions
+- ✅ Comments in Java
+- ✅ Keywords
+- ✅ Identifiers
 
 ### Day 2: Variables, Data Types & Control Statements
 - [ ] Variables
