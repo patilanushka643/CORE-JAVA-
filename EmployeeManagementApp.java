@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,13 +16,9 @@ public class EmployeeManagementApp {
 
     public static void main(String[] args) {
         List<Employee> employees = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-
-        try {
+        try (Scanner scanner = new Scanner(System.in)) {
             runMenu(scanner, employees);
         } finally {
-            // Scanner is closed even when the menu exits because of an unexpected error.
-            scanner.close();
             System.out.println("Application closed.");
         }
     }
@@ -37,27 +32,16 @@ public class EmployeeManagementApp {
             int choice = readInt(scanner, "Enter your choice: ");
 
             switch (choice) {
-                case 1:
-                    addEmployee(scanner, employees);
-                    break;
-                case 2:
-                    viewAllEmployees(employees);
-                    break;
-                case 3:
-                    searchEmployee(scanner, employees);
-                    break;
-                case 4:
-                    saveEmployees(scanner, employees);
-                    break;
-                case 5:
-                    loadEmployees(scanner, employees);
-                    break;
-                case 6:
+                case 1 -> addEmployee(scanner, employees);
+                case 2 -> viewAllEmployees(employees);
+                case 3 -> searchEmployee(scanner, employees);
+                case 4 -> saveEmployees(scanner, employees);
+                case 5 -> loadEmployees(scanner, employees);
+                case 6 -> {
                     running = false;
                     System.out.println("Thank you for using the Employee Management System.");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Select an option from 1 to 6.");
+                }
+                default -> System.out.println("Invalid choice. Select an option from 1 to 6.");
             }
         }
     }
@@ -112,12 +96,8 @@ public class EmployeeManagementApp {
 
     private static void saveEmployees(Scanner scanner, List<Employee> employees) {
         String fileName = readFileName(scanner);
-        FileWriter fileWriter = null;
-        BufferedWriter writer = null;
-
-        try {
-            fileWriter = new FileWriter(fileName);
-            writer = new BufferedWriter(fileWriter);
+        try (FileWriter fileWriter = new FileWriter(fileName);
+                BufferedWriter writer = new BufferedWriter(fileWriter)) {
             for (Employee employee : employees) {
                 writer.write(employee.toFileString());
                 writer.newLine();
@@ -125,21 +105,15 @@ public class EmployeeManagementApp {
             System.out.println("Employees saved successfully to " + fileName + ".");
         } catch (IOException exception) {
             System.out.println("Unable to save employees: " + exception.getMessage());
-        } finally {
-            closeWriter(writer);
-            closeFileWriter(fileWriter);
         }
     }
 
     private static void loadEmployees(Scanner scanner, List<Employee> employees) {
         String fileName = readFileName(scanner);
-        FileReader fileReader = null;
-        BufferedReader reader = null;
         List<Employee> loadedEmployees = new ArrayList<>();
 
-        try {
-            fileReader = new FileReader(fileName);
-            reader = new BufferedReader(fileReader);
+        try (FileReader fileReader = new FileReader(fileName);
+                BufferedReader reader = new BufferedReader(fileReader)) {
             String line;
             int lineNumber = 0;
 
@@ -169,9 +143,6 @@ public class EmployeeManagementApp {
             System.out.println("File not found: " + fileName);
         } catch (IOException exception) {
             System.out.println("Unable to load employees: " + exception.getMessage());
-        } finally {
-            closeReader(reader);
-            closeFileReader(fileReader);
         }
     }
 
@@ -201,9 +172,6 @@ public class EmployeeManagementApp {
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException exception) {
                 System.out.println("Please enter a valid whole number.");
-            } catch (InputMismatchException exception) {
-                System.out.println("Invalid input.");
-                scanner.nextLine();
             }
         }
     }
@@ -240,45 +208,6 @@ public class EmployeeManagementApp {
         return fileName.isEmpty() ? DEFAULT_FILE_NAME : fileName;
     }
 
-    private static void closeWriter(BufferedWriter writer) {
-        if (writer != null) {
-            try {
-                writer.close();
-            } catch (IOException exception) {
-                System.out.println("Unable to close the buffered writer: " + exception.getMessage());
-            }
-        }
-    }
-
-    private static void closeFileWriter(FileWriter writer) {
-        if (writer != null) {
-            try {
-                writer.close();
-            } catch (IOException exception) {
-                System.out.println("Unable to close the file writer: " + exception.getMessage());
-            }
-        }
-    }
-
-    private static void closeReader(BufferedReader reader) {
-        if (reader != null) {
-            try {
-                reader.close();
-            } catch (IOException exception) {
-                System.out.println("Unable to close the buffered reader: " + exception.getMessage());
-            }
-        }
-    }
-
-    private static void closeFileReader(FileReader reader) {
-        if (reader != null) {
-            try {
-                reader.close();
-            } catch (IOException exception) {
-                System.out.println("Unable to close the file reader: " + exception.getMessage());
-            }
-        }
-    }
 }
 
 /**
@@ -291,10 +220,14 @@ class Employee {
     private double salary;
 
     public Employee(int id, String name, String department, double salary) {
-        setId(id);
-        setName(name);
-        setDepartment(department);
-        setSalary(salary);
+        validateId(id);
+        validateText(name, "Name");
+        validateText(department, "Department");
+        validateSalary(salary);
+        this.id = id;
+        this.name = name.trim();
+        this.department = department.trim();
+        this.salary = salary;
     }
 
     public int getId() {
@@ -302,9 +235,7 @@ class Employee {
     }
 
     public void setId(int id) {
-        if (id <= 0) {
-            throw new IllegalArgumentException("ID must be greater than zero.");
-        }
+        validateId(id);
         this.id = id;
     }
 
@@ -313,7 +244,8 @@ class Employee {
     }
 
     public void setName(String name) {
-        this.name = requireText(name, "Name");
+        validateText(name, "Name");
+        this.name = name.trim();
     }
 
     public String getDepartment() {
@@ -321,7 +253,8 @@ class Employee {
     }
 
     public void setDepartment(String department) {
-        this.department = requireText(department, "Department");
+        validateText(department, "Department");
+        this.department = department.trim();
     }
 
     public double getSalary() {
@@ -329,9 +262,7 @@ class Employee {
     }
 
     public void setSalary(double salary) {
-        if (!Double.isFinite(salary) || salary < 0) {
-            throw new IllegalArgumentException("Salary must be a non-negative finite number.");
-        }
+        validateSalary(salary);
         this.salary = salary;
     }
 
@@ -365,11 +296,22 @@ class Employee {
                 id, name, department, salary);
     }
 
-    private static String requireText(String value, String fieldName) {
+    private static void validateId(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("ID must be greater than zero.");
+        }
+    }
+
+    private static void validateText(String value, String fieldName) {
         if (value == null || value.trim().isEmpty() || value.indexOf('\t') >= 0) {
             throw new IllegalArgumentException(fieldName
                     + " cannot be empty or contain tab characters.");
         }
-        return value.trim();
+    }
+
+    private static void validateSalary(double salary) {
+        if (!Double.isFinite(salary) || salary < 0) {
+            throw new IllegalArgumentException("Salary must be a non-negative finite number.");
+        }
     }
 }

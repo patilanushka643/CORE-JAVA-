@@ -31,24 +31,15 @@ public class LibraryManagementApp {
             int choice = readInt(scanner, "Enter your choice: ");
 
             switch (choice) {
-                case 1:
-                    addBook(scanner, library);
-                    break;
-                case 2:
-                    library.displayAvailableBooks();
-                    break;
-                case 3:
-                    borrowBook(scanner, library);
-                    break;
-                case 4:
-                    returnBook(scanner, library);
-                    break;
-                case 5:
+                case 1 -> addBook(scanner, library);
+                case 2 -> library.displayAvailableBooks();
+                case 3 -> borrowBook(scanner, library);
+                case 4 -> returnBook(scanner, library);
+                case 5 -> {
                     isRunning = false;
                     System.out.println("Thank you for using the Library Management System. Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please select an option from 1 to 5.");
+                }
+                default -> System.out.println("Invalid choice. Please select an option from 1 to 5.");
             }
         }
     }
@@ -141,9 +132,12 @@ class Book {
     private String issuedToUserId;
 
     public Book(String bookId, String title, String author) {
-        setBookId(bookId);
-        setTitle(title);
-        setAuthor(author);
+        validateText(bookId, "Book ID");
+        validateText(title, "Title");
+        validateText(author, "Author");
+        this.bookId = bookId.trim();
+        this.title = title.trim();
+        this.author = author.trim();
         this.isIssued = false;
     }
 
@@ -152,7 +146,8 @@ class Book {
     }
 
     public void setBookId(String bookId) {
-        this.bookId = requireText(bookId, "Book ID");
+        validateText(bookId, "Book ID");
+        this.bookId = bookId.trim();
     }
 
     public String getTitle() {
@@ -160,7 +155,8 @@ class Book {
     }
 
     public void setTitle(String title) {
-        this.title = requireText(title, "Title");
+        validateText(title, "Title");
+        this.title = title.trim();
     }
 
     public String getAuthor() {
@@ -168,7 +164,8 @@ class Book {
     }
 
     public void setAuthor(String author) {
-        this.author = requireText(author, "Author");
+        validateText(author, "Author");
+        this.author = author.trim();
     }
 
     public boolean isIssued() {
@@ -183,7 +180,8 @@ class Book {
         if (isIssued) {
             throw new IllegalStateException("The book is already issued.");
         }
-        issuedToUserId = requireText(userId, "User ID");
+        validateText(userId, "User ID");
+        issuedToUserId = userId.trim();
         isIssued = true;
     }
 
@@ -200,11 +198,10 @@ class Book {
         return String.format("ID: %s | Title: %s | Author: %s", bookId, title, author);
     }
 
-    private static String requireText(String value, String fieldName) {
+    private static void validateText(String value, String fieldName) {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException(fieldName + " cannot be empty.");
         }
-        return value.trim();
     }
 }
 
@@ -216,8 +213,10 @@ abstract class User {
     private String name;
 
     protected User(String userId, String name) {
-        this.userId = requireText(userId, "User ID");
-        setName(name);
+        validateText(userId, "User ID");
+        validateText(name, "Name");
+        this.userId = userId.trim();
+        this.name = name.trim();
     }
 
     public String getUserId() {
@@ -229,18 +228,18 @@ abstract class User {
     }
 
     public final void setName(String name) {
-        this.name = requireText(name, "Name");
+        validateText(name, "Name");
+        this.name = name.trim();
     }
 
     public abstract int getBorrowingLimit();
 
     public abstract void displayUserDetails();
 
-    private static String requireText(String value, String fieldName) {
+    private static void validateText(String value, String fieldName) {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException(fieldName + " cannot be empty.");
         }
-        return value.trim();
     }
 }
 
